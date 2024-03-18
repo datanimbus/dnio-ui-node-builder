@@ -1,0 +1,23 @@
+<div class="d-flex align-items-start p-3">
+    <div class="list-group me-3">
+        <div class="list-group-item list-group-item-action" [class.active]="null==selectedGroup" (click)="selectedGroup=null">ALL</div>
+        <div *ngFor="let item of groupList" [class.active]="item==selectedGroup" class="list-group-item list-group-item-action" (click)="selectedGroup=item">
+            {{item|uppercase}}
+        </div>
+    </div>
+    <div class="list-group w-100">
+        <div *ngFor="let item of nodeList|filter:selectedGroup:'group'" class="list-group-item list-group-item-action"
+            [routerLink]="item.type">
+            <div class="d-flex align-items-center">
+                <span class="icon border rounded me-2">
+                    <img [src]="item.icon" alt="Icon">
+                </span>
+                <div class="d-flex justify-centent-start flex-column">
+                    <div>{{item.label}}</div>
+                    <div>{{item.type}}</div>
+                </div>
+                <span class="badge bg-dark ms-2">v{{item.version}}</span>
+            </div>
+        </div>
+    </div>
+</div>

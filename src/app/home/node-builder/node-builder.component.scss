@@ -1,0 +1,23 @@
+.input-schema,
+.output-schema {
+    min-width: 400px;
+}
+
+.editor {
+    min-height: 500px;
+}
+
+.code-container.full-screen {
+    width: 100%;
+    max-width: calc(100% - 20px);
+    max-height: calc(100% - 20px);
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    background: #fff;
+
+    .editor {
+        height: calc(100vh - 100px);
+    }
+}

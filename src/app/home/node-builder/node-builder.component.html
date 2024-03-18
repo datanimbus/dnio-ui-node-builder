@@ -1,0 +1,92 @@
+<div class="sub-heading d-flex align-items-center justify-content-between p-2 border-bottom">
+    <div>
+        <h5>Node Editor</h5>
+    </div>
+    <div *ngIf="data" class="d-flex align-items-center justify-content-center">
+        <div class="border rounded p-2 font-12 d-flex align-items-center me-2">
+            <div class="me-1 fw-500 text-uppercase">Label:</div>
+            <div>{{data.label}}</div>
+        </div>
+        <div class="border rounded p-2 font-12 d-flex align-items-center me-2">
+            <div class="me-1 fw-500 text-uppercase">Category:</div>
+            <div>{{data.category}}</div>
+        </div>
+        <div class="border rounded p-2 font-12 d-flex align-items-center">
+            <div class="me-1 fw-500 text-uppercase">Type:</div>
+            <div>V1_{{data.type}}</div>
+        </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-end btn-group">
+        <button type="button" class="btn btn-dark d-flex align-items-center" (click)="onNewClick($event)">
+            <span class="font-12 fw-500">NEW</span>
+            <span class="bi bi-plus-circle ms-2"></span>
+        </button>
+        <button type="button" class="btn btn-dark d-flex align-items-center" (click)="onImportClick($event)">
+            <span class="font-12 fw-500">IMPORT</span>
+            <span class="bi bi-arrow-down-circle ms-2"></span>
+        </button>
+        <button type="button" class="btn btn-dark d-flex align-items-center" (click)="onExportClick($event)">
+            <span class="font-12 fw-500">EXPORT</span>
+            <span class="bi bi-arrow-up-circle ms-2"></span>
+        </button>
+        <!-- <button type="button" class="btn btn-success d-flex align-items-center">
+            <span>Save</span>
+            <span class="bi bi-floppy ms-2"></span>
+        </button> -->
+    </div>
+</div>
+<ng-container *ngIf="data">
+    <div class="d-flex align-items-start p-3">
+        <div class="input-schema border rounded p-2">
+            <div class="fw-500 font-18 mb-2 text-primary">Input Schema</div>
+            <app-schema-builder [(schema)]="data.inputSchema"
+                (schemaChange)="onSchemaChange($event,'input')"></app-schema-builder>
+        </div>
+        <div class="d-flex flex-column w-100">
+            <div class="code-container border rounded"
+                [ngClass]="{'mx-3':!toggleFullScreen,'full-screen':toggleFullScreen}">
+                <div class="d-flex align-items-center justify-content-between border-bottom p-2">
+                    <div class="fw-500 font-18 text-primary">Code</div>
+                    <div class="icon">
+                        <svg *ngIf="!toggleFullScreen" (click)="toggleFullScreen=!toggleFullScreen"
+                            ngbTooltip="Fullscreen" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            fill="currentColor" class="bi bi-fullscreen" viewBox="0 0 16 16">
+                            <path
+                                d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5" />
+                        </svg>
+                        <svg *ngIf="toggleFullScreen" (click)="toggleFullScreen=!toggleFullScreen"
+                            ngbTooltip="Exit Fullscreen" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            fill="currentColor" class="bi bi-fullscreen-exit" viewBox="0 0 16 16">
+                            <path
+                                d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5m5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5M0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5m10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="editor border rounded m-3">
+                    <ngx-monaco-editor *ngIf="toggleFullScreen" class="editor" [options]="editorOptions" [(ngModel)]="data.code"
+                        (ngModelChange)="onModelChange($event)"></ngx-monaco-editor>
+                    <ngx-monaco-editor *ngIf="!toggleFullScreen" class="editor" [options]="editorOptions" [(ngModel)]="data.code"
+                        (ngModelChange)="onModelChange($event)"></ngx-monaco-editor>
+                </div>
+            </div>
+            <div class="info-window bg-light border rounded mt-3 p-3 mx-3">
+                <pre><span class="text-success">//Use <b>connectorData.&lt;schema_key&gt;</b> to get connector data<br>//Use <b>inputData.&lt;schema_key&gt;</b> to get input data</span></pre>
+            </div>
+        </div>
+        <div class="output-schema border rounded p-2">
+            <div class="fw-500 font-18 mb-2 text-primary">Output Schema</div>
+            <app-schema-builder [(schema)]="data.outputSchema"
+                (schemaChange)="onSchemaChange($event,'output')"></app-schema-builder>
+        </div>
+    </div>
+</ng-container>
+
+<div *ngIf="!data" class="d-flex justify-content-center mt-4">
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted font-14 text-uppercase">Please start by choosing one of the above options, <b>NEW</b>,
+                <b>IMPORT</b>, <b>EXPORT</b>
+            </p>
+        </div>
+    </div>
+</div>

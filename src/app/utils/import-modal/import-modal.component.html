@@ -1,0 +1,21 @@
+<div class="modal-header">
+    <div class="modal-title">
+        <h5>Import Node</h5>
+    </div>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss(false)"></button>
+</div>
+<div class="modal-body">
+    <p>Select JSON File</p>
+    <input class="form-control" type="file" (click)="isValidJSON=false; true;" (appJsonFileSelect)="onFileSelect($event)">
+    <div class="d-flex align-items-center w-100 my-3">
+        <hr class="w-100 m-0">
+        <span class="mx-2 fw-500 font-12 text-muted">OR</span>
+        <hr class="w-100 m-0">
+    </div>
+    <p>Paste Your JSON</p>
+    <textarea class="form-control" cols="30" rows="10" (keyup)="onJSONPaste($event)" (paste)="onJSONPaste($event)"></textarea>
+</div>
+<div class="modal-footer">
+    <button type="button" (click)="activeModal.close(false)" class="btn btn-light border">Cancel</button>
+    <button type="button" (click)="activeModal.close({data:jsonData})" class="btn btn-dark" [disabled]="!isValidJSON">Import</button>
+</div>

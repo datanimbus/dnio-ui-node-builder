@@ -1,0 +1,51 @@
+<div class="schema-form">
+    <div class="field-group" *ngFor="let item of schema;let i=index">
+        <div class="field">
+            <div class="input-group">
+                <input id="key" class="form-control" type="text" name="key" [ngModel]="item.key"
+                    (appJsonPaste)="onJSONPaste($event,item)" (ngModelChange)="onKeyChange($event,item)"
+                    (keyup.enter)="addField(i+1)" placeholder="key" appAutoFocus>
+                <select id="type" class="form-select" name="type" [ngModel]="item.type"
+                    (ngModelChange)="onTypeChange($event,item)">
+                    <option [value]="undefined">---select---</option>
+                    <option value="String">String</option>
+                    <option value="Number">Number</option>
+                    <option value="Boolean">Boolean</option>
+                    <option value="Datetime">Datetime</option>
+                    <option value="Buffer">Buffer</option>
+                    <option value="Schema">Schema</option>
+                    <option value="Object">Object</option>
+                    <option value="Array">Array</option>
+                </select>
+                <select *ngIf="item.type=='Array'" id="subType" class="form-select" name="subType"
+                    [ngModel]="item.subType" (ngModelChange)="onSubTypeChange($event,item)">
+                    <option [value]="undefined">---select---</option>
+                    <option value="String">String</option>
+                    <option value="Number">Number</option>
+                    <option value="Boolean">Boolean</option>
+                    <option value="Datetime">Datetime</option>
+                    <option value="Object">Object</option>
+                </select>
+                <button type="button" class="btn btn-light border text-primary" (click)="addField(i)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+                </button>
+                <button *ngIf="schema.length>1" type="button" class="btn btn-light border text-danger"
+                    (click)="removeField(i)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-dash-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div *ngIf="item.type=='Object' || item.subType=='Object'" class="ms-3">
+            <app-schema-builder [(schema)]="item.schema"></app-schema-builder>
+        </div>
+    </div>
+</div>

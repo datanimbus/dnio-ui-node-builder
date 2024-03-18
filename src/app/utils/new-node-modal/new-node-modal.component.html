@@ -1,0 +1,48 @@
+<div class="modal-header">
+    <div class="modal-title">
+        <h5>Create New Node</h5>
+    </div>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss(false)"></button>
+</div>
+<div class="modal-body">
+    <div class="form-group mb-3">
+        <label class="mb-1 font-12 text-uppercase" for="label">Label</label>
+        <input id="label" type="text" class="form-control" [(ngModel)]="data.label">
+    </div>
+    <div class="form-group mb-3">
+        <label class="mb-1 font-12 text-uppercase" for="category">Category</label>
+        <select id="category" type="text" class="form-select" [(ngModel)]="data.category">
+            <option value="TRIGGER">Trigger</option>
+            <option value="PROCESS">Process</option>
+        </select>
+    </div>
+    <div class="form-group mb-3">
+        <label class="mb-1 font-12 text-uppercase" for="group">Group</label>
+        <select id="group" type="text" class="form-select" [(ngModel)]="data.group">
+            <option value="Misc">Misc</option>
+            <option value="Queue">Queue</option>
+            <option value="HTTP">HTTP</option>
+            <option value="Database">Database</option>
+            <option value="File">FILE</option>
+            <option value="Blob">Blob</option>
+            <option value="DataService">Data Service</option>
+        </select>
+    </div>
+    <div class="form-group mb-3">
+        <label class="mb-1 font-12 text-uppercase" for="type">Type</label>
+        <div class="input-group">
+            <div class="input-group-text text-muted font-13 fw-500">V1_</div>
+            <input id="type" type="text" class="form-control" [(ngModel)]="data.type">
+        </div>
+    </div>
+    <div class="form-group mb-3">
+        <label class="mb-1 font-12 text-uppercase" for="icon">Icon</label>
+        <div class="input-group">
+            <input id="icon" type="text" class="form-control" [(ngModel)]="data.icon">
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" (click)="activeModal.close(false)" class="btn btn-light border">Cancel</button>
+    <button type="button" (click)="activeModal.close({data})" class="btn btn-dark">Create</button>
+</div>

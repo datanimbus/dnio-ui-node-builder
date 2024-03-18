@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <div class="modal-title">
+        <h5>Export Node</h5>
+    </div>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss(false)"></button>
+</div>
+<div class="modal-body">
+    <p>Enter File Name</p>
+    <div class="input-group">
+        <input class="form-control" type="text" [(ngModel)]="filename" placeholder="Filename">
+        <div class="input-group-text">.json</div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" (click)="activeModal.close(false)" class="btn btn-light border">Cancel</button>
+    <button type="button" (click)="activeModal.close({filename})" class="btn btn-dark">Export</button>
+</div>

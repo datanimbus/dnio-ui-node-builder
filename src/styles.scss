@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons';
+
+@for $i from 7 through 26 {
+    .font-#{$i} {
+        font-size: #{$i}px;
+    }
+}
+
+$weights: 200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900;
+
+@each $size in $weights {
+    .fw-#{$size} {
+        font-weight: $size;
+    }
+}
