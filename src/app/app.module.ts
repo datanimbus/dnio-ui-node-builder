@@ -20,6 +20,7 @@ import { NewNodeModalComponent } from './utils/new-node-modal/new-node-modal.com
 import { JsonFileSelectDirective } from './directives/json-file-select.directive';
 import { ExportModalComponent } from './utils/export-modal/export-modal.component';
 import { FilterPipe } from './pipes/filter.pipe';
+import { ConnectorsComponent } from './home/connectors/connectors.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { FilterPipe } from './pipes/filter.pipe';
     NewNodeModalComponent,
     JsonFileSelectDirective,
     ExportModalComponent,
-    FilterPipe
+    FilterPipe,
+    ConnectorsComponent
   ],
   imports: [
     BrowserModule,

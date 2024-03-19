@@ -10,7 +10,8 @@ export class AlertModalComponent {
 
   title!: string;
   message!: string;
+  type:string;
   constructor(public activeModal: NgbActiveModal) {
-
+    this.type = 'alert';
   }
 }

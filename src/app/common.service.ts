@@ -11,10 +11,11 @@ export class CommonService {
   initNodeData() {
     return {
       category: 'PROCESS',
-      group: 'Queue',
+      group: 'Misc',
       type: 'V1_',
-      label: 'ActiveMQ Emitter',
+      label: '',
       icon: '',
+      version: 1,
       inputSchema: [{}],
       outputSchema: [{}],
       errorSchema: [

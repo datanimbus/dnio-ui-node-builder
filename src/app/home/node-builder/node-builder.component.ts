@@ -89,7 +89,7 @@ export class NodeBuilderComponent implements OnInit {
   }
   onSaveClick($event: MouseEvent) {
     const payload = _.cloneDeep(this.data);
-    payload.code = payload.code.split('\n');
+    payload.code = payload.code.split('\n').filter((e: string) => e);
     if (_.isNull(this.selectedIndex)) {
       this.nodeList.push(payload)
     } else {

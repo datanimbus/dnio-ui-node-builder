@@ -1,9 +1,18 @@
 <nav class="navbar bg-light border-bottom border-body">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <img src="https://datanimbus.com/wp-content/uploads/2023/09/Logodatanimbus.png" alt="Logo" width="200" class="d-inline-block align-text-center">
-      </a>
-      <h5 class="float-end m-0">Node Builder</h5>
-    </div>
-  </nav>
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="https://datanimbus.com/wp-content/uploads/2023/09/Logodatanimbus.png" alt="Logo" width="200"
+        class="d-inline-block align-text-center">
+    </a>
+    <ul class="nav nav-pills float-start">
+      <li class="nav-item">
+        <a class="nav-link text-uppercase font-12" routerLinkActive="active" routerLink="node">Nodes</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-uppercase font-12" routerLinkActive="active" routerLink="connector">Connectors</a>
+      </li>
+    </ul>
+    <h5 class="float-end m-0">Node Builder</h5>
+  </div>
+</nav>
 <router-outlet></router-outlet>

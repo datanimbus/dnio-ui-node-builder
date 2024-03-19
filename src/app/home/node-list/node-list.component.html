@@ -1,3 +1,22 @@
+<div class="sub-heading d-flex align-items-center justify-content-between p-2 border-bottom">
+    <div>
+        <h5>Node List</h5>
+    </div>
+    <div class="d-flex align-items-center justify-content-end btn-group">
+        <button type="button" class="btn btn-light border d-flex align-items-center" (click)="onNewClick($event)">
+            <span class="bi bi-plus-circle me-2"></span>
+            <span class="font-12">NEW</span>
+        </button>
+        <button type="button" class="btn btn-light border d-flex align-items-center" (click)="onImportClick($event)">
+            <span class="bi bi-arrow-down-circle me-2"></span>
+            <span class="font-12">IMPORT</span>
+        </button>
+        <button type="button" class="btn btn-light border d-flex align-items-center" (click)="onExportClick($event)">
+            <span class="bi bi-arrow-up-circle me-2"></span>
+            <span class="font-12">EXPORT</span>
+        </button>
+    </div>
+</div>
 <div class="d-flex align-items-start p-3">
     <div class="list-group me-3">
         <div class="list-group-item list-group-item-action" [class.active]="null==selectedGroup"

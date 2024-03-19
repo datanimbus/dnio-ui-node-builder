@@ -9,5 +9,6 @@
 </div>
 <div class="modal-footer">
     <button type="button" (click)="activeModal.close(false)" class="btn btn-light border">No</button>
-    <button type="button" (click)="activeModal.close(true)" class="btn btn-dark">Yes</button>
+    <button *ngIf="type=='alert'" type="button" (click)="activeModal.close(true)" class="btn btn-dark">Yes</button>
+    <button *ngIf="type=='delete'" type="button" (click)="activeModal.close(true)" class="btn btn-danger">Delete</button>
 </div>
