@@ -12,11 +12,15 @@
                     <option value="Number">Number</option>
                     <option value="Boolean">Boolean</option>
                     <option value="Datetime">Datetime</option>
-                    <option value="Buffer">Buffer</option>
-                    <option value="Schema">Schema</option>
-                    <option value="KeyValPair">KeyValPair</option>
                     <option value="Object">Object</option>
                     <option value="Array">Array</option>
+                    <option value="Schema">Schema</option>
+                    <option value="Buffer">Buffer</option>
+                    <option value="FormData">FormData</option>
+                    <option value="KeyValPair">KeyValPair</option>
+                    <option value="ParseOptionSchema">ParseOptionSchema</option>
+                    <option value="RenderOptionSchema">RenderOptionSchema</option>
+                    <option value="FileMetaSchema">FileMetaSchema</option>
                 </select>
                 <select *ngIf="item.type=='Array'" id="subType" class="form-select" name="subType"
                     [ngModel]="item.subType" (ngModelChange)="onSubTypeChange($event,item)">
@@ -26,6 +30,8 @@
                     <option value="Boolean">Boolean</option>
                     <option value="Datetime">Datetime</option>
                     <option value="Object">Object</option>
+                    <option value="Schema">Schema</option>
+                    <option value="FileMetaSchema">FileMetaSchema</option>
                 </select>
                 <button type="button" class="btn btn-light border text-primary" (click)="addField(i)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
