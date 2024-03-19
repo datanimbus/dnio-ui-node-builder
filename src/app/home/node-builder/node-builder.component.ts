@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import * as _ from 'lodash';
 
@@ -6,7 +7,6 @@ import { CommonService } from 'src/app/common.service';
 import { ImportModalComponent } from 'src/app/utils/import-modal/import-modal.component';
 import { NewNodeModalComponent } from 'src/app/utils/new-node-modal/new-node-modal.component';
 import { ExportModalComponent } from 'src/app/utils/export-modal/export-modal.component';
-import { Router } from '@angular/router';
 
 
 @Component({
