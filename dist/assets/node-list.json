@@ -1,0 +1,3513 @@
+[
+	{
+		"category": "TRIGGER",
+		"group": "Misc",
+		"version": 1,
+		"type": "V1_TIMER",
+		"label": "Timer",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "cron",
+				"type": "String"
+			},
+			{
+				"key": "holidayList",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "timestamp",
+				"type": "Datetime"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NONE",
+		"code": [
+			"cron.schedule(inputData.cron, async () => {",
+			"    try {",
+			"        const date = new Date();",
+			"        const isoString = date.toISOString();",
+			"        const payload = { triggerTime: isoString };",
+			"        const headers = { 'dnio-remote-txn-id': isoString };",
+			"        makeRequestToThisFlow(payload, headers);",
+			"    } catch (err) {",
+			"        logger.error(err);",
+			"    }",
+			"});"
+		]
+	},
+	{
+		"category": "TRIGGER",
+		"group": "HTTP",
+		"version": 1,
+		"type": "V1_HTTP_SERVER",
+		"label": "HTTP Server",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "method",
+				"type": "String"
+			},
+			{
+				"key": "path",
+				"type": "String"
+			},
+			{
+				"key": "uniqueTxn",
+				"type": "Boolean"
+			},
+			{
+				"key": "enableAuth",
+				"type": "Boolean"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "pathParams",
+				"type": "Object"
+			},
+			{
+				"key": "queryParams",
+				"type": "Object"
+			},
+			{
+				"key": "headers",
+				"type": "Object"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NONE"
+	},
+	{
+		"category": "TRIGGER",
+		"group": "Queue",
+		"version": 1,
+		"type": "V1_KAFKA_SUBSCRIBER",
+		"label": "Kafka Listener",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "queue",
+				"type": "String"
+			},
+			{
+				"key": "topic",
+				"type": "String"
+			},
+			{
+				"key": "clientId",
+				"type": "String"
+			},
+			{
+				"key": "batchSize",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "KAFKA",
+		"code": [
+			"const { Kafka } = require('kafkajs');",
+			"const kafkaOptions = {",
+			"    clientId: connectorData.clientId,",
+			"    brokers: connectorData.brokers",
+			"};",
+			"if (connectorData.ssl) {",
+			"    kafkaOptions.ssl = connectorData.ssl;",
+			"}",
+			"if (connectorData.sasl) {",
+			"    kafkaOptions.sasl = {",
+			"        mechanism: 'plain',",
+			"        username: connectorData.username,",
+			"        password: connectorData.password,",
+			"    };",
+			"}",
+			"const kafka = new Kafka(kafkaOptions);",
+			"const consumer = kafka.consumer({ groupId: inputData.groupId });",
+			"const runConsumer = async () => {",
+			"    await consumer.connect();",
+			"    await consumer.subscribe({ topic: inputData.topic });",
+			"    await consumer.run({",
+			"        eachMessage: async ({ topic, partition, message }) => {",
+			"            logger.info('Received a message:', message);",
+			"            StartProcess(message.value)",
+			"        }",
+			"    });",
+			"};",
+			"runConsumer().catch(logger.error);"
+		]
+	},
+	{
+		"category": "TRIGGER",
+		"group": "Queue",
+		"version": 1,
+		"type": "V1_NATS_SUBSCRIBER",
+		"label": "NATS Listener",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "queue",
+				"type": "String"
+			},
+			{
+				"key": "clientId",
+				"type": "String"
+			},
+			{
+				"key": "batchSize",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NATS",
+		"code": [
+			"const NATS = require('nats');",
+			"const nc = NATS.connect({",
+			"    servers: [connectorData.server],",
+			"});",
+			"nc.subscribe(inputData.queue, (msg) => {",
+			"    logger.info('Received a message:', msg);",
+			"    StartProcess(Buffer.from(msg));",
+			"});",
+			"nc.on('error', (err) => {",
+			"    logger.error('NATS error:', err);",
+			"});",
+			"process.on('SIGINT', () => {",
+			"    nc.close();",
+			"    logger.info('NATS connection closed.');",
+			"});"
+		]
+	},
+	{
+		"category": "TRIGGER",
+		"group": "Queue",
+		"version": 1,
+		"type": "V1_ACTIVEMQ_SUBSCRIBER",
+		"label": "ActiveMQ Listener",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "queue",
+				"type": "String"
+			},
+			{
+				"key": "topic",
+				"type": "String"
+			},
+			{
+				"key": "clientId",
+				"type": "String"
+			},
+			{
+				"key": "batchSize",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "ACTIVEMQ",
+		"code": [
+			""
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "HTTP",
+		"version": 1,
+		"type": "V1_HTTP_CLIENT",
+		"label": "HTTP Client",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "method",
+				"type": "String"
+			},
+			{
+				"key": "path",
+				"type": "String"
+			},
+			{
+				"key": "query",
+				"type": "Object"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			},
+			{
+				"key": "headers",
+				"type": "Object"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			},
+			{
+				"key": "throwErrorOn4xx",
+				"type": "Boolean"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "headers",
+				"type": "Object"
+			},
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "HTTP",
+		"code": [
+			"const axios = require('axios');",
+			"const axiosConfig = {};",
+			"axiosConfig.responseType = 'arraybuffer';",
+			"axiosConfig.method = inputData.method;",
+			"axiosConfig.url = `${connectorData.protocol}://${connectorData.host}:${connectorData.port}${inputData.path}`;",
+			"axiosConfig.data = inputData.data;",
+			"axiosConfig.params = inputData.query;",
+			"axiosConfig.headers = inputData.headers;",
+			"axiosConfig.timeout = inputData.timeout || 60000;",
+			"axiosConfig.validateStatus = function (status) {",
+			"    if (inputData.throwErrorOn4xx) {",
+			"        return status >= 200 && status < 300;",
+			"    } else {",
+			"        return status >= 200 && status < 500;",
+			"    }",
+			"};",
+			"let response = await axios(axiosConfig);",
+			"return response;"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MYSQL_QUERY",
+		"label": "MySQL Query",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MYSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MYSQL_INSERT",
+		"label": "MySQL Insert",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "insertedCount",
+				"type": "Number"
+			},
+			{
+				"key": "insertedIds",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MYSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MYSQL_UPDATE",
+		"label": "MySQL Update",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "matchedCount",
+				"type": "Number"
+			},
+			{
+				"key": "modifiedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MYSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MYSQL_DELETE",
+		"label": "MySQL Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "deletedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MYSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MYSQL_PROCEDURE",
+		"label": "MySQL Call Procedure",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "procedureName",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MYSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_ORACLE_QUERY",
+		"label": "ORACLE Query",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "ORACLE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_ORACLE_INSERT",
+		"label": "ORACLE Insert",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "insertedCount",
+				"type": "Number"
+			},
+			{
+				"key": "insertedIds",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "ORACLE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_ORACLE_UPDATE",
+		"label": "ORACLE Update",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "matchedCount",
+				"type": "Number"
+			},
+			{
+				"key": "modifiedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "ORACLE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_ORACLE_DELETE",
+		"label": "ORACLE Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "deletedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "ORACLE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_ORACLE_PROCEDURE",
+		"label": "ORACLE Call Procedure",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "procedureName",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "ORACLE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MSSQL_QUERY",
+		"label": "MSSQL Query",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MSSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MSSQL_INSERT",
+		"label": "MSSQL Insert",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "insertedCount",
+				"type": "Number"
+			},
+			{
+				"key": "insertedIds",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MSSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MSSQL_UPDATE",
+		"label": "MSSQL Update",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "matchedCount",
+				"type": "Number"
+			},
+			{
+				"key": "modifiedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MSSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MSSQL_DELETE",
+		"label": "MSSQL Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "deletedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MSSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MSSQL_PROCEDURE",
+		"label": "MSSQL Call Procedure",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "procedureName",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MSSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_POSTGRE_QUERY",
+		"label": "Postgre Query",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "PGSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_POSTGRE_INSERT",
+		"label": "Postgre Insert",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "insertedCount",
+				"type": "Number"
+			},
+			{
+				"key": "insertedIds",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "PGSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_POSTGRE_UPDATE",
+		"label": "Postgre Update",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "matchedCount",
+				"type": "Number"
+			},
+			{
+				"key": "modifiedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "PGSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_POSTGRE_DELETE",
+		"label": "Postgre Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "query",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "deletedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "PGSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_POSTGRE_PROCEDURE",
+		"label": "Postgre Call Procedure",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "procedureName",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "PGSQL"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MONGODB_FIND_MANY",
+		"label": "MongoDB Find Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "project",
+				"type": "Object"
+			},
+			{
+				"key": "sort",
+				"type": "Object"
+			},
+			{
+				"key": "limit",
+				"type": "Number"
+			},
+			{
+				"key": "offset",
+				"type": "Number"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MONGODB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MONGODB_INSERT_MANY",
+		"label": "MongoDB Insert Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "insertedCount",
+				"type": "Number"
+			},
+			{
+				"key": "insertedIds",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MONGODB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MONGODB_UPDATE_MANY",
+		"label": "MongoDB Update Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "matchedCount",
+				"type": "Number"
+			},
+			{
+				"key": "modifiedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MONGODB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_MONGODB_DELETE_MANY",
+		"label": "MongoDB Delete Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "deletedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "MONGODB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_DOCUMENTDB_FIND_MANY",
+		"label": "DocumentDB Find Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "project",
+				"type": "Object"
+			},
+			{
+				"key": "sort",
+				"type": "Object"
+			},
+			{
+				"key": "limit",
+				"type": "Number"
+			},
+			{
+				"key": "offset",
+				"type": "Number"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DOCUMENTDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_DOCUMENTDB_INSERT_MANY",
+		"label": "DocumentDB Insert Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "insertedCount",
+				"type": "Number"
+			},
+			{
+				"key": "insertedIds",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DOCUMENTDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_DOCUMENTDB_UPDATE_MANY",
+		"label": "DocumentDB Update Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "matchedCount",
+				"type": "Number"
+			},
+			{
+				"key": "modifiedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DOCUMENTDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_DOCUMENTDB_DELETE_MANY",
+		"label": "DocumentDB Delete Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "deletedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DOCUMENTDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_COSMOSDB_FIND_MANY",
+		"label": "CosmosDB Find Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "project",
+				"type": "Object"
+			},
+			{
+				"key": "sort",
+				"type": "Object"
+			},
+			{
+				"key": "limit",
+				"type": "Number"
+			},
+			{
+				"key": "offset",
+				"type": "Number"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "COSMOSDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_COSMOSDB_INSERT_MANY",
+		"label": "CosmosDB Insert Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "insertedCount",
+				"type": "Number"
+			},
+			{
+				"key": "insertedIds",
+				"type": "Array",
+				"subType": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "COSMOSDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_COSMOSDB_UPDATE_MANY",
+		"label": "CosmosDB Update Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "matchedCount",
+				"type": "Number"
+			},
+			{
+				"key": "modifiedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "COSMOSDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Database",
+		"version": 1,
+		"type": "V1_COSMOSDB_DELETE_MANY",
+		"label": "CosmosDB Delete Many",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "deletedCount",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "COSMOSDB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_SFTP_LIST",
+		"label": "SFTP List",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "folderPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Array",
+				"subType": "Object",
+				"schema": [
+					{
+						"key": "type",
+						"type": "String"
+					},
+					{
+						"key": "name",
+						"type": "String"
+					},
+					{
+						"key": "size",
+						"type": "Number"
+					},
+					{
+						"key": "modifyTime",
+						"type": "Number"
+					}
+				]
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "SFTP",
+		"code": [
+			"let sftp;",
+			"if (!global[connectorData._id]) {",
+			"    logger.info('Creating new SFTP Connection');",
+			"    let sftpTemp = new Client();",
+			"    const sftpOptions = {};",
+			"    sftpOptions.host = connectorData.host;",
+			"    sftpOptions.port = connectorData.port;",
+			"    sftpOptions.username = connectorData.user;",
+			"    if (connectorData.authType == 'password') {",
+			"        sftpOptions.password = connectorData.password;",
+			"    } else if (connectorData.authType == 'privateKey') {",
+			"        sftpOptions.privateKey = connectorData.privateKey;",
+			"        sftpOptions.passphrase = connectorData.passphrase;",
+			"    }",
+			"    if (!inputData.folderPath) {",
+			"        throw new Error('No Directory Path provided');",
+			"    }",
+			"    await sftpTemp.connect(sftpOptions);",
+			"    global[connectorData._id] = sftpTemp;",
+			"} else {",
+			"    logger.info('SFTP Connection Exists!');",
+			"}",
+			"sftp = global[connectorData._id];",
+			"const fileList = await sftp.list(inputData.folderPath);",
+			"logger.info('Files in SFTP folder ', fileList.length);",
+			"logger.debug(JSON.stringify(fileList));",
+			"req.logger.info('Files in SFTP folder ', fileList.length);",
+			"req.logger.debug(JSON.stringify(fileList));",
+			"return fileList;"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_SFTP_GET",
+		"label": "SFTP Get",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filePath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "SFTP",
+		"code": [
+			"let sftp;",
+			"if (!global[connectorData._id]) {",
+			"    logger.info('Creating new SFTP Connection');",
+			"    let sftpTemp = new Client();",
+			"    const sftpOptions = {};",
+			"    sftpOptions.host = connectorData.host;",
+			"    sftpOptions.port = connectorData.port;",
+			"    sftpOptions.username = connectorData.user;",
+			"    if (connectorData.authType == 'password') {",
+			"        sftpOptions.password = connectorData.password;",
+			"    } else if (connectorData.authType == 'privateKey') {",
+			"        sftpOptions.privateKey = connectorData.privateKey;",
+			"        sftpOptions.passphrase = connectorData.passphrase;",
+			"    }",
+			"    if (!inputData.filePath) {",
+			"        throw new Error('No File Path provided');",
+			"    }",
+			"    await sftpTemp.connect(sftpOptions);",
+			"    global[connectorData._id] = sftpTemp;",
+			"} else {",
+			"    logger.info('SFTP Connection Exists!');",
+			"}",
+			"sftp = global[connectorData._id];",
+			"const data = await sftp.get(inputData.filePath);",
+			"if (data && !_.isEmpty(data)) {",
+			"    logger.info('File Found of Size :', data.length);",
+			"    req.logger.info('File Found of Size :', data.length);",
+			"    return { data };",
+			"} else {",
+			"    throw Error('File Not Found');",
+			"}"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_SFTP_PUT",
+		"label": "SFTP Put",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filePath",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "SFTP",
+		"code": [
+			"let sftp;",
+			"if (!global[connectorData._id]) {",
+			"    logger.info('Creating new SFTP Connection');",
+			"    let sftpTemp = new Client();",
+			"    const sftpOptions = {};",
+			"    sftpOptions.host = connectorData.host;",
+			"    sftpOptions.port = connectorData.port;",
+			"    sftpOptions.username = connectorData.user;",
+			"    if (connectorData.authType == 'password') {",
+			"        sftpOptions.password = connectorData.password;",
+			"    } else if (connectorData.authType == 'privateKey') {",
+			"        sftpOptions.privateKey = connectorData.privateKey;",
+			"        sftpOptions.passphrase = connectorData.passphrase;",
+			"    }",
+			"    if (!inputData.filePath) {",
+			"        throw new Error('No File Path provided');",
+			"    }",
+			"    await sftpTemp.connect(sftpOptions);",
+			"    global[connectorData._id] = sftpTemp;",
+			"} else {",
+			"    logger.info('SFTP Connection Exists!');",
+			"}",
+			"sftp = global[connectorData._id];",
+			"const result = await sftp.put(inputData.data, inputData.filePath);",
+			"if (result && !_.isEmpty(result)) {",
+			"    logger.info('File Uploaded :', result);",
+			"    req.logger.info('File Uploaded :', result);",
+			"    return { statusCode: 200, message: result };",
+			"} else {",
+			"    throw Error('File Not Found');",
+			"}"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_SFTP_RENAME",
+		"label": "SFTP Rename",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "sourceFilePath",
+				"type": "String"
+			},
+			{
+				"key": "targetFilePath",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "SFTP",
+		"code": [
+			"let sftp;",
+			"if (!global[connectorData._id]) {",
+			"    logger.info('Creating new SFTP Connection');",
+			"    let sftpTemp = new Client();",
+			"    const sftpOptions = {};",
+			"    sftpOptions.host = connectorData.host;",
+			"    sftpOptions.port = connectorData.port;",
+			"    sftpOptions.username = connectorData.user;",
+			"    if (connectorData.authType == 'password') {",
+			"        sftpOptions.password = connectorData.password;",
+			"    } else if (connectorData.authType == 'privateKey') {",
+			"        sftpOptions.privateKey = connectorData.privateKey;",
+			"        sftpOptions.passphrase = connectorData.passphrase;",
+			"    }",
+			"    if (!inputData.filePath) {",
+			"        throw new Error('No File Path provided');",
+			"    }",
+			"    await sftpTemp.connect(sftpOptions);",
+			"    global[connectorData._id] = sftpTemp;",
+			"} else {",
+			"    logger.info('SFTP Connection Exists!');",
+			"}",
+			"sftp = global[connectorData._id];",
+			"const result = await sftp.rename(inputData.sourceFilePath, inputData.targetFilePath);",
+			"if (result && !_.isEmpty(result)) {",
+			"    logger.info('File Renamed :', result);",
+			"    req.logger.info('File Renamed :', result);",
+			"    return { statusCode: 200, message: result };",
+			"} else {",
+			"    throw Error('File Not Found');",
+			"}"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_SFTP_DELETE",
+		"label": "SFTP Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filePath",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "SFTP",
+		"code": [
+			"let sftp;",
+			"if (!global[connectorData._id]) {",
+			"    logger.info('Creating new SFTP Connection');",
+			"    let sftpTemp = new Client();",
+			"    const sftpOptions = {};",
+			"    sftpOptions.host = connectorData.host;",
+			"    sftpOptions.port = connectorData.port;",
+			"    sftpOptions.username = connectorData.user;",
+			"    if (connectorData.authType == 'password') {",
+			"        sftpOptions.password = connectorData.password;",
+			"    } else if (connectorData.authType == 'privateKey') {",
+			"        sftpOptions.privateKey = connectorData.privateKey;",
+			"        sftpOptions.passphrase = connectorData.passphrase;",
+			"    }",
+			"    if (!inputData.filePath) {",
+			"        throw new Error('No File Path provided');",
+			"    }",
+			"    await sftpTemp.connect(sftpOptions);",
+			"    global[connectorData._id] = sftpTemp;",
+			"} else {",
+			"    logger.info('SFTP Connection Exists!');",
+			"}",
+			"sftp = global[connectorData._id];",
+			"const result = await sftp.delete(inputData.filePath);",
+			"if (result && !_.isEmpty(result)) {",
+			"    logger.info('File Deleted :', result);",
+			"    req.logger.info('File Deleted :', result);",
+			"    return { statusCode: 200, message: result };",
+			"} else {",
+			"    throw Error('File Not Found');",
+			"}"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_DISK_LIST",
+		"label": "Disk List",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "folderPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Array",
+				"subType": "Object",
+				"schema": [
+					{
+						"key": "type",
+						"type": "String"
+					},
+					{
+						"key": "name",
+						"type": "String"
+					},
+					{
+						"key": "size",
+						"type": "Number"
+					},
+					{
+						"key": "modifyTime",
+						"type": "Number"
+					}
+				]
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DISK",
+		"code": [
+			"const directoryPath = path.resolve(connectorData.containerPath, inputData.folderPath);",
+			"const files = fs.readdirSync(directoryPath);",
+			"const result = [];",
+			"files.forEach((file) => {",
+			"    let fileObj = {};",
+			"    const filePath = `${directoryPath}/${file}`;",
+			"    const stats = fs.statSync(filePath);",
+			"    fileObj.name = file;",
+			"    fileObj.size = stats.size;",
+			"    fileObj.modifyTime = stats.mtime.getTime();",
+			"    fileObj.type = stats.isFile() ? '-' : (stats.isDirectory() ? 'd' : 'l')",
+			"    result.push(fileObj);",
+			"});",
+			"return { data: result };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_DISK_GET",
+		"label": "Disk Get",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filePath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DISK",
+		"code": [
+			"const directoryPath = path.resolve(connectorData.containerPath, inputData.filePath);",
+			"const content = fs.readFileSync(directoryPath);",
+			"return { data:content };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_DISK_PUT",
+		"label": "Disk Put",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filePath",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DISK",
+		"code": [
+			"const directoryPath = path.resolve(connectorData.containerPath, inputData.filePath);",
+			"fs.writeFileSync(directoryPath, inputData.data);",
+			"return { statusCode: 200, message: \"File Written Successfully\" };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_DISK_RENAME",
+		"label": "Disk Rename",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "sourceFilePath",
+				"type": "String"
+			},
+			{
+				"key": "targetFilePath",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DISK",
+		"code": [
+			"const sourceDirectoryPath = path.resolve(connectorData.containerPath, inputData.sourceFilePath);",
+			"const targetDirectoryPath = path.resolve(connectorData.containerPath, inputData.targetFilePath);",
+			"fs.renameSync(sourceDirectoryPath, targetDirectoryPath);",
+			"return { statusCode: 200, message: \"File Renamed Successfully\" };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "File",
+		"version": 1,
+		"type": "V1_DISK_DELETE",
+		"label": "Disk Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filePath",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DISK",
+		"code": [
+			"const directoryPath = path.resolve(connectorData.containerPath, inputData.filePath);",
+			"fs.rmSync(directoryPath);",
+			"return { statusCode: 200, message: \"File Deleted Successfully\" };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_AZBLOB_LIST",
+		"label": "Azure Blob List",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "folderPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "type",
+				"type": "String"
+			},
+			{
+				"key": "name",
+				"type": "String"
+			},
+			{
+				"key": "size",
+				"type": "Number"
+			},
+			{
+				"key": "modifyTime",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "AZBLOB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_AZBLOB_GET",
+		"label": "Azure Blob Get",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "AZBLOB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_AZBLOB_PUT",
+		"label": "Azure Blob Put",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "AZBLOB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_AZBLOB_DELETE",
+		"label": "Azure Blob Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "AZBLOB"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_S3_LIST",
+		"label": "AWS S3 List",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "folderPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "type",
+				"type": "String"
+			},
+			{
+				"key": "name",
+				"type": "String"
+			},
+			{
+				"key": "size",
+				"type": "Number"
+			},
+			{
+				"key": "modifyTime",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "S3"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_S3_GET",
+		"label": "AWS S3 Get",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "S3"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_S3_PUT",
+		"label": "AWS S3 Put",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "S3"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_S3_DELETE",
+		"label": "AWS S3 Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "S3"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_GCS_LIST",
+		"label": "Google Blob List",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "folderPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "type",
+				"type": "String"
+			},
+			{
+				"key": "name",
+				"type": "String"
+			},
+			{
+				"key": "size",
+				"type": "Number"
+			},
+			{
+				"key": "modifyTime",
+				"type": "Number"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "GCS"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_GCS_GET",
+		"label": "Google Blob Get",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "GCS"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_GCS_PUT",
+		"label": "Google Blob Put",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "GCS"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Blob",
+		"version": 1,
+		"type": "V1_GCS_DELETE",
+		"label": "Google Blob Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "blobPath",
+				"type": "String"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "GCS"
+	},
+	{
+		"category": "PROCESS",
+		"group": "DataService",
+		"version": 1,
+		"type": "V1_DATASERVICE_COUNT",
+		"label": "Data Service Count",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DATASERVICE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "DataService",
+		"version": 1,
+		"type": "V1_DATASERVICE_LIST",
+		"label": "Data Service List",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "sort",
+				"type": "Object"
+			},
+			{
+				"key": "select",
+				"type": "Object"
+			},
+			{
+				"key": "count",
+				"type": "Number"
+			},
+			{
+				"key": "page",
+				"type": "Number"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DATASERVICE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "DataService",
+		"version": 1,
+		"type": "V1_DATASERVICE_GET",
+		"label": "Data Service Show",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "select",
+				"type": "Object"
+			},
+			{
+				"key": "timeout",
+				"type": "Number"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DATASERVICE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "DataService",
+		"version": 1,
+		"type": "V1_DATASERVICE_POST",
+		"label": "Data Service Create",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DATASERVICE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "DataService",
+		"version": 1,
+		"type": "V1_DATASERVICE_PUT",
+		"label": "Data Service Update",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DATASERVICE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "DataService",
+		"version": 1,
+		"type": "V1_DATASERVICE_DELETE",
+		"label": "Data Service Delete",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "filter",
+				"type": "Object"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "DATASERVICE"
+	},
+	{
+		"category": "PROCESS",
+		"group": "Misc",
+		"version": 1,
+		"type": "V1_BUFFER_PARSER",
+		"label": "Deserialize Buffer",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			},
+			{
+				"key": "options",
+				"type": "ParseOptionSchema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NONE",
+		"code": [
+			"let data;",
+			"if (inputData.outputFormat.formatType == 'JSON') {",
+			"    data = JSON.parse(inputData.data);",
+			"} else if (inputData.outputFormat.formatType == 'XML') {",
+			"    const { XMLParser } = require('fast-xml-parser');",
+			"    const xmlParser = new XMLParser();",
+			"    data = xmlParser.parse(inputData.data);",
+			"} else {",
+			"    const parseOptions =  {};",
+			"    parseOptions.skipLines = inputData.options.skipLines;",
+			"    parseOptions.skipRows = inputData.options.skipRows;",
+			"    parseOptions.maxRows = inputData.options.maxRows;",
+			"    parseOptions.sheetNo = inputData.options.sheetNo;",
+			"    parseOptions.ignoreEmpty = inputData.options.ignoreEmpty;",
+			"    parseOptions.delimiter = inputData.options.delimiter;",
+			"    parseOptions.rowDelimiter = inputData.options.rowDelimiter;",
+			"    data = await fileParserUtils.parseV1File(req, inputData.data, parseOptions);",
+			"}",
+			"return { data };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Misc",
+		"version": 1,
+		"type": "V1_BUFFER_RENDERER",
+		"label": "Serialize Buffer",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "Schema"
+			},
+			{
+				"key": "options",
+				"type": "RenderOptionSchema"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NONE",
+		"code": [
+			"let data;",
+			"if (inputData.outputFormat.formatType == 'JSON') {",
+			"    data = Buffer.from(JSON.stringify(inputData.data));",
+			"} else if (inputData.outputFormat.formatType == 'XML') {",
+			"    const { XMLBuilder } = require('fast-xml-parser');",
+			"    const xmlBuilder = new XMLBuilder({ format: true, arrayNodeName: `${inputData.outputFormat.rootNodeName || 'ROOT'}` });",
+			"    data = Buffer.from(xmlBuilder.build(inputData.data));",
+			"} else {",
+			"    const renderOptions =  {};",
+			"    renderOptions.skipLines = inputData.options.skipLines;",
+			"    renderOptions.skipRows = inputData.options.skipRows;",
+			"    renderOptions.maxRows = inputData.options.maxRows;",
+			"    renderOptions.sheetNo = inputData.options.sheetNo;",
+			"    renderOptions.delimiter = inputData.options.delimiter;",
+			"    renderOptions.ignoreEmpty = inputData.options.ignoreEmpty;",
+			"    renderOptions.rowDelimiter = inputData.options.rowDelimiter;",
+			"    data = await fileRenderUtils.renderV1File(req, inputData.data, renderOptions);",
+			"}",
+			"return { data };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Misc",
+		"version": 1,
+		"type": "V1_FORMDATA_PARSER",
+		"label": "Deserialize Form Data",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			},
+			{
+				"key": "headers",
+				"type": "Object"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "FormData"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NONE",
+		"code": [
+			"const busboy = require('busboy');",
+			"const data = await new Promise((resolve, reject) => {",
+			"    const result = {};",
+			"    const parser = busboy({ headers: { 'content-type': inputData.headers['content-type'] } });",
+			"    parser.on('file', async (name, file, info) => {",
+			"        result[name] = await commonUtils.getStreamAsBuffer(file);",
+			"    });",
+			"    parser.on('field', (name, val, info) => {",
+			"        result[name] = val;",
+			"    });",
+			"    parser.on('close', () => {",
+			"        resolve(result);",
+			"    });",
+			"    parser.on('error', (err) => {",
+			"        reject(err);",
+			"    });",
+			"    parser.write(inputData.data);",
+			"});",
+			"return { data };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Misc",
+		"version": 1,
+		"type": "V1_FORMDATA_RENDERER",
+		"label": "Serialize Form Data",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "data",
+				"type": "FormData"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "data",
+				"type": "Buffer"
+			},
+			{
+				"key": "headers",
+				"type": "Object"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NONE",
+		"code": [
+			"const formData = new FormData();",
+			"Object.key(inputData).forEach((key) => {",
+			"    formData.append(key, inputData[key]);",
+			"});",
+			"const data = formData.getBuffer();",
+			"const headers = formData.getHeaders();",
+			"return { data, headers };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Queue",
+		"version": 1,
+		"type": "V1_KAFKA_PUBLISHER",
+		"label": "Kafka Emitter",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "queue",
+				"type": "String"
+			},
+			{
+				"key": "topic",
+				"type": "String"
+			},
+			{
+				"key": "clientId",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "KAFKA",
+		"code": [
+			"const { Kafka } = require('kafkajs');",
+			"const kafkaOptions = {",
+			"    clientId: connectorData.clientId,",
+			"    brokers: connectorData.brokers",
+			"};",
+			"if (connectorData.ssl) {",
+			"    kafkaOptions.ssl = connectorData.ssl;",
+			"}",
+			"if (connectorData.sasl) {",
+			"    kafkaOptions.sasl = {",
+			"        mechanism: 'plain',",
+			"        username: connectorData.username,",
+			"        password: connectorData.password,",
+			"    };",
+			"}",
+			"const kafka = new Kafka(kafkaOptions);",
+			"const producer = kafka.producer({ groupId: inputData.groupId });",
+			"await producer.connect();",
+			"await producer.send({ topic: inputData.topic, messages: [{ value: inputData.data }] });",
+			"await producer.disconnect();"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Queue",
+		"version": 1,
+		"type": "V1_NATS_PUBLISHER",
+		"label": "NATS Emitter",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "queue",
+				"type": "String"
+			},
+			{
+				"key": "clientId",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "NATS",
+		"code": [
+			"const NATS = require('nats');",
+			"const nc = NATS.connect({",
+			"    servers: [connectorData.server],",
+			"});",
+			"process.on('SIGINT', () => {",
+			"    nc.close();",
+			"    logger.info('NATS connection closed.');",
+			"});",
+			"await new Promise((resolve, reject)=>{",
+			"    nc.publish(inputData.queue, inputData.data, (err) => {",
+			"        if (err) {",
+			"            logger.error(`Failed to publish message to subject '${inputData.queue}'`, err);",
+			"            return reject(err);",
+			"        }",
+			"        console.log(`Message published to subject '${inputData.queue}'`);",
+			"        resolve();",
+			"    });",
+			"    nc.on('error', (err) => {",
+			"        logger.error('NATS error:', err);",
+			"        reject(err);",
+			"    });",
+			"});",
+			"return { statusCode: 200, message: 'Message Published' };"
+		]
+	},
+	{
+		"category": "PROCESS",
+		"group": "Queue",
+		"version": 1,
+		"type": "V1_ACTIVEMQ_PUBLISHER",
+		"label": "ActiveMQ Emitter",
+		"icon": "",
+		"inputSchema": [
+			{
+				"key": "queue",
+				"type": "String"
+			},
+			{
+				"key": "topic",
+				"type": "String"
+			},
+			{
+				"key": "clientId",
+				"type": "String"
+			},
+			{
+				"key": "data",
+				"type": "Buffer"
+			}
+		],
+		"outputSchema": [
+			{
+				"key": "statusCode",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			}
+		],
+		"errorSchema": [
+			{
+				"key": "code",
+				"type": "Number"
+			},
+			{
+				"key": "message",
+				"type": "String"
+			},
+			{
+				"key": "stackTrace",
+				"type": "String"
+			}
+		],
+		"connectorType": "ACTIVEMQ"
+	}
+]
