@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 
 import { ApiService } from 'src/app/api.service';
 import { CommonService } from 'src/app/common.service';
+import { FilterPipe } from 'src/app/pipes/filter.pipe';
 import { ExportModalComponent } from 'src/app/utils/export-modal/export-modal.component';
 import { ImportModalComponent } from 'src/app/utils/import-modal/import-modal.component';
 import { NewNodeModalComponent } from 'src/app/utils/new-node-modal/new-node-modal.component';
@@ -20,10 +21,12 @@ export class NodeListComponent implements OnInit {
   groupList: Array<string>;
   selectedGroup!: any;
   selectedNode!: string;
+  searchTerm!: string;
   constructor(private apiService: ApiService,
     private router: Router,
     private modalService: NgbModal,
-    private commonUtils: CommonService) {
+    private commonUtils: CommonService,
+    private filterPipe: FilterPipe) {
     this.nodeList = [];
     this.groupList = [];
   }
@@ -96,5 +99,15 @@ export class NodeListComponent implements OnInit {
         this.commonUtils.downloadText(result.filename + '.json', JSON.stringify(payload, null, 4));
       }
     }, (dismiss) => { });
+  }
+
+  get nodeListByFilter() {
+    if (this.selectedGroup) {
+      return this.filterPipe.transform(this.nodeList, 'group', this.selectedGroup);
+    } else if (this.searchTerm) {
+      return this.filterPipe.transform(this.nodeList, 'label', this.searchTerm);
+    } else {
+      return this.nodeList;
+    }
   }
 }

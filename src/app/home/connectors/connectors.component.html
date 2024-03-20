@@ -18,20 +18,27 @@
     </div>
 </div>
 <div class="d-flex align-items-start p-3">
-    <div class="connector-list list-group list-group-flush border rounded w-100">
-        <div *ngFor="let item of connectorList|filter:searchTerm:'name'" class="list-group-item list-group-item-action"
-            (click)="onEditClicked($event,item)" [class.active]="isSelected(item)">
-            <div class="d-flex align-items-center">
-                <div class="thumbnail border rounded me-2 d-flex align-items-center justify-content-center font-20 bg-white p-2"
-                    [innerHTML]="transform(item.thumbnail)"></div>
-                <div class="d-flex align-items-start justify-content-between w-100">
-                    <div class="d-flex justify-content-start flex-column">
-                        <div class="fw-500">{{item.label}}</div>
-                        <div class="text-muted font-12">{{item.type}}</div>
+    <div class="sidnav">
+        <div class="border rounded mb-3 p-2">
+            <input type="text" class="form-control" [(ngModel)]="searchTerm" placeholder="Search">
+        </div>
+        <div class="connector-list list-group list-group-flush border rounded w-100">
+            <div *ngFor="let item of connectorListWithFilter"
+                class="list-group-item list-group-item-action" (click)="onEditClicked($event,item)"
+                [class.active]="isSelected(item)">
+                <div class="d-flex align-items-center">
+                    <div class="thumbnail border rounded me-2 d-flex align-items-center justify-content-center font-20 bg-white p-2"
+                        [innerHTML]="transform(item.thumbnail)"></div>
+                    <div class="d-flex align-items-start justify-content-between w-100">
+                        <div class="d-flex justify-content-start flex-column">
+                            <div class="fw-500">{{item.label}}</div>
+                            <div class="text-muted font-12">{{item.type}}</div>
+                        </div>
+                        <small class="align-self-end text-muted font-10">v{{item.version.toFixed(1)}}</small>
                     </div>
-                    <small class="align-self-end text-muted font-10">v{{item.version.toFixed(1)}}</small>
                 </div>
             </div>
+            <div *ngIf="!connectorListWithFilter || connectorListWithFilter.length==0" class="list-group-item">No Connectors</div>
         </div>
     </div>
     <div class="connector-data border rounded p-3 ms-3 w-100 h-100 text-center">

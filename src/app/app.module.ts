@@ -47,7 +47,7 @@ import { ConnectorsComponent } from './home/connectors/connectors.component';
     FormsModule,
     MonacoEditorModule.forRoot()
   ],
-  providers: [ApiService],
+  providers: [ApiService, FilterPipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

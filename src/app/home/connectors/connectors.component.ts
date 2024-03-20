@@ -4,6 +4,7 @@ import { NgbModal, NgbModalRef, NgbOffcanvas, NgbOffcanvasRef } from '@ng-bootst
 import * as _ from 'lodash';
 
 import { CommonService } from 'src/app/common.service';
+import { FilterPipe } from 'src/app/pipes/filter.pipe';
 import { AlertModalComponent } from 'src/app/utils/alert-modal/alert-modal.component';
 import { ExportModalComponent } from 'src/app/utils/export-modal/export-modal.component';
 import { ImportModalComponent } from 'src/app/utils/import-modal/import-modal.component';
@@ -26,7 +27,8 @@ export class ConnectorsComponent {
   constructor(private modalService: NgbModal,
     private offcanvasService: NgbOffcanvas,
     private commonUtils: CommonService,
-    private sanitizer: DomSanitizer) {
+    private sanitizer: DomSanitizer,
+    private filterPipe: FilterPipe) {
     this.connectorList = [];
     this.values = {};
   }
@@ -144,5 +146,12 @@ export class ConnectorsComponent {
   }
   transform(html: string): any {
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  get connectorListWithFilter() {
+    if (this.searchTerm) {
+      return this.filterPipe.transform(this.connectorList, 'label', this.searchTerm);
+    }
+    return this.connectorList;
   }
 }
