@@ -4,6 +4,8 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
 
+@import "./assets/node-icons/style.scss";
+
 @for $i from 7 through 26 {
     .font-#{$i} {
         font-size: #{$i}px;

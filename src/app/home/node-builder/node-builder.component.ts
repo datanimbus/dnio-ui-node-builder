@@ -68,6 +68,15 @@ export class NodeBuilderComponent implements OnInit {
       }
     }, (dismiss) => { });
   }
+  onEditClick($event: MouseEvent) {
+    let modalRef: NgbModalRef = this.modalService.open(NewNodeModalComponent, { centered: true });
+    modalRef.componentInstance.data = this.data;
+    modalRef.result.then((result) => {
+      if (result && result.data) {
+        this.resetNode(result.data);
+      }
+    }, (dismiss) => { });
+  }
   onImportClick($event: MouseEvent) {
     let modalRef: NgbModalRef = this.modalService.open(ImportModalComponent, { centered: true });
     modalRef.result.then((result) => {
