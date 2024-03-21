@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as _ from 'lodash';
 
@@ -7,13 +7,17 @@ import * as _ from 'lodash';
   templateUrl: './new-node-modal.component.html',
   styleUrls: ['./new-node-modal.component.scss']
 })
-export class NewNodeModalComponent {
+export class NewNodeModalComponent implements OnInit {
 
   connectorList: Array<any>;
   data: any;
   constructor(public activeModal: NgbActiveModal) {
     this.data = {};
     this.connectorList = [];
+  }
+
+  ngOnInit(): void {
+    this.connectorList = JSON.parse(localStorage.getItem('connectorList') as string);
   }
 
   onCreateClicked($event: any) {

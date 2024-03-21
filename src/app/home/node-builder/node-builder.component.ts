@@ -7,6 +7,7 @@ import { CommonService } from 'src/app/common.service';
 import { ImportModalComponent } from 'src/app/utils/import-modal/import-modal.component';
 import { NewNodeModalComponent } from 'src/app/utils/new-node-modal/new-node-modal.component';
 import { ExportModalComponent } from 'src/app/utils/export-modal/export-modal.component';
+import { AlertModalComponent } from 'src/app/utils/alert-modal/alert-modal.component';
 
 
 @Component({
@@ -74,6 +75,18 @@ export class NodeBuilderComponent implements OnInit {
     modalRef.result.then((result) => {
       if (result && result.data) {
         this.resetNode(result.data);
+      }
+    }, (dismiss) => { });
+  }
+  onDeleteClick($event: MouseEvent) {
+    let modalRef: NgbModalRef = this.modalService.open(AlertModalComponent, { centered: true });
+    modalRef.componentInstance.title = 'Delete Node?';
+    modalRef.componentInstance.message = 'Are you sure you want to delete this node?';
+    modalRef.result.then((result) => {
+      if (result) {
+        this.nodeList.splice(this.selectedIndex, 1);
+        localStorage.setItem('nodeList', JSON.stringify(this.nodeList));
+        this.onCancelClick(null);
       }
     }, (dismiss) => { });
   }

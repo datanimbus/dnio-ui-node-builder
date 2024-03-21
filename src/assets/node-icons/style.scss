@@ -3,9 +3,9 @@
 @font-face {
   font-family: '#{$icomoon-font-family}';
   src:
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?aceuwn') format('truetype'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?aceuwn') format('woff'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?aceuwn##{$icomoon-font-family}') format('svg');
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?c3btaq') format('truetype'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?c3btaq') format('woff'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?c3btaq##{$icomoon-font-family}') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -26,10 +26,52 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ni-sftp {
+.ni-smtp {
   &:before {
-    content: $ni-sftp;     
-    color: #fec866;
+    content: $ni-smtp;     
+    color: #2b6ed4;
+  }
+}
+.ni-xlsx {
+  &:before {
+    content: $ni-xlsx;     
+    color: #56b746;
+  }
+}
+.ni-flat {
+  &:before {
+    content: $ni-flat;     
+    color: #624971;
+  }
+}
+.ni-txt {
+  &:before {
+    content: $ni-txt;     
+    color: #6372c1;
+  }
+}
+.ni-delimeter {
+  &:before {
+    content: $ni-delimeter;     
+    color: #008ac8;
+  }
+}
+.ni-csv {
+  &:before {
+    content: $ni-csv;     
+    color: #a1b343;
+  }
+}
+.ni-json {
+  &:before {
+    content: $ni-json;     
+    color: #ff7c54;
+  }
+}
+.ni-xml {
+  &:before {
+    content: $ni-xml;     
+    color: #4e9157;
   }
 }
 .ni-process {
@@ -56,52 +98,16 @@
     color: #2e3192;
   }
 }
-.ni-folder .path1 {
+.ni-folder {
   &:before {
-    content: $ni-folder-path1;  
-    color: rgb(254, 201, 40);
+    content: $ni-folder;     
+    color: #fec928;
   }
 }
-.ni-folder .path2 {
+.ni-sftp {
   &:before {
-    content: $ni-folder-path2;  
-    margin-left: -1em;  
-    color: rgb(254, 159, 0);
-  }
-}
-.ni-folder .path3 {
-  &:before {
-    content: $ni-folder-path3;  
-    margin-left: -1em;  
-    color: rgb(254, 214, 93);
-  }
-}
-.ni-folder .path4 {
-  &:before {
-    content: $ni-folder-path4;  
-    margin-left: -1em;  
-    color: rgb(254, 214, 93);
-  }
-}
-.ni-folder .path5 {
-  &:before {
-    content: $ni-folder-path5;  
-    margin-left: -1em;  
-    color: rgb(254, 214, 93);
-  }
-}
-.ni-folder .path6 {
-  &:before {
-    content: $ni-folder-path6;  
-    margin-left: -1em;  
-    color: rgb(254, 184, 65);
-  }
-}
-.ni-folder .path7 {
-  &:before {
-    content: $ni-folder-path7;  
-    margin-left: -1em;  
-    color: rgb(254, 184, 65);
+    content: $ni-sftp;     
+    color: #fec866;
   }
 }
 .ni-render {
@@ -131,7 +137,7 @@
 .ni-blob-get {
   &:before {
     content: $ni-blob-get;     
-    color: #39b54a;
+    color: #22b573;
   }
 }
 .ni-blob-list {
