@@ -73,10 +73,7 @@
                     </div>
                 </div>
                 <div class="editor border rounded m-3">
-                    <ngx-monaco-editor *ngIf="toggleFullScreen" class="editor" [options]="editorOptions"
-                        [(ngModel)]="data.code" (ngModelChange)="onModelChange($event)"></ngx-monaco-editor>
-                    <ngx-monaco-editor *ngIf="!toggleFullScreen" class="editor" [options]="editorOptions"
-                        [(ngModel)]="data.code" (ngModelChange)="onModelChange($event)"></ngx-monaco-editor>
+                    <app-code-editor class="editor" [(code)]="data.code"></app-code-editor>
                 </div>
             </div>
             <div class="info-window bg-light border rounded mt-3 p-3 mx-3">

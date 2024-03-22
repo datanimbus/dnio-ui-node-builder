@@ -1,32 +1,10 @@
-.connector-list {
-    max-width: 300px;
+.connector-card {
+    min-width: 300px;
     overflow-y: auto;
-    max-height: calc(100vh - 160px);
+    height: 68px;
 
     .thumbnail {
-        min-width: 48px;
-        min-height: 48px;
-    }
-}
-
-.connector-data {
-    overflow-y: auto;
-    max-height: calc(100vh - 160px);
-
-    .thumbnail {
-        min-width: 144px;
-        min-height: 144px;
-    }
-
-    .key-val {
-        .key {
-            min-width: 160px;
-        }
-    }
-
-    .field-list {
-        .card {
-            width: 300px;
-        }
+        min-width: 50px;
+        min-height: 50px;
     }
 }

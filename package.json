@@ -23,7 +23,7 @@
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.11.3",
     "lodash": "^4.17.21",
-    "ngx-monaco-editor-v2": "^16.0.1",
+    "monaco-editor": "^0.47.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"

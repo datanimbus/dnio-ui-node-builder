@@ -3,9 +3,9 @@
 @font-face {
   font-family: '#{$icomoon-font-family}';
   src:
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?c3btaq') format('truetype'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?c3btaq') format('woff'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?c3btaq##{$icomoon-font-family}') format('svg');
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?gb1vtd') format('truetype'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?gb1vtd') format('woff'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?gb1vtd##{$icomoon-font-family}') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -26,6 +26,114 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ni-cloud-file-rm {
+  &:before {
+    content: $ni-cloud-file-rm;     
+    color: #c1272d;
+  }
+}
+.ni-cloud-file-read {
+  &:before {
+    content: $ni-cloud-file-read;     
+    color: #22b573;
+  }
+}
+.ni-cloud-file-write {
+  &:before {
+    content: $ni-cloud-file-write;     
+    color: #f7931e;
+  }
+}
+.ni-cloud-file-ls {
+  &:before {
+    content: $ni-cloud-file-ls;     
+    color: #2b6ed4;
+  }
+}
+.ni-disk-mv {
+  &:before {
+    content: $ni-disk-mv;     
+    color: #6372c1;
+  }
+}
+.ni-disk-rm {
+  &:before {
+    content: $ni-disk-rm;     
+    color: #c1272d;
+  }
+}
+.ni-disk-read {
+  &:before {
+    content: $ni-disk-read;     
+    color: #22b573;
+  }
+}
+.ni-disk-write {
+  &:before {
+    content: $ni-disk-write;     
+    color: #f7931e;
+  }
+}
+.ni-disk-ls {
+  &:before {
+    content: $ni-disk-ls;     
+    color: #2b6ed4;
+  }
+}
+.ni-sftp-mv {
+  &:before {
+    content: $ni-sftp-mv;     
+    color: #6372c1;
+  }
+}
+.ni-sftp-rm {
+  &:before {
+    content: $ni-sftp-rm;     
+    color: #c1272d;
+  }
+}
+.ni-sftp-read {
+  &:before {
+    content: $ni-sftp-read;     
+    color: #22b573;
+  }
+}
+.ni-sftp-write {
+  &:before {
+    content: $ni-sftp-write;     
+    color: #f7931e;
+  }
+}
+.ni-sftp-ls {
+  &:before {
+    content: $ni-sftp-ls;     
+    color: #2b6ed4;
+  }
+}
+.ni-blob-rm {
+  &:before {
+    content: $ni-blob-rm;     
+    color: #c1272d;
+  }
+}
+.ni-blob-read {
+  &:before {
+    content: $ni-blob-read;     
+    color: #22b573;
+  }
+}
+.ni-blob-write {
+  &:before {
+    content: $ni-blob-write;     
+    color: #f7931e;
+  }
+}
+.ni-blob-ls {
+  &:before {
+    content: $ni-blob-ls;     
+    color: #2b6ed4;
+  }
+}
 .ni-smtp {
   &:before {
     content: $ni-smtp;     
@@ -89,13 +197,13 @@
 .ni-queue-subscribe {
   &:before {
     content: $ni-queue-subscribe;     
-    color: #736357;
+    color: #6372c1;
   }
 }
 .ni-queue-publish {
   &:before {
     content: $ni-queue-publish;     
-    color: #2e3192;
+    color: #4e9157;
   }
 }
 .ni-folder {

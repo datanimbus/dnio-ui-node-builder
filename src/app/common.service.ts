@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import * as _ from 'lodash';
 
 @Injectable({
@@ -6,7 +6,11 @@ import * as _ from 'lodash';
 })
 export class CommonService {
 
-  constructor() { }
+  updateCodeEditorState: EventEmitter<any>;
+
+  constructor() {
+    this.updateCodeEditorState = new EventEmitter();
+  }
 
   initNodeData() {
     return {

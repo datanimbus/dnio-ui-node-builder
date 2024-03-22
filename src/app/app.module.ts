@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -21,6 +20,8 @@ import { JsonFileSelectDirective } from './directives/json-file-select.directive
 import { ExportModalComponent } from './utils/export-modal/export-modal.component';
 import { FilterPipe } from './pipes/filter.pipe';
 import { ConnectorsComponent } from './home/connectors/connectors.component';
+import { CodeEditorComponent } from './utils/code-editor/code-editor.component';
+import { ConnectorEditorComponent } from './home/connector-editor/connector-editor.component';
 
 @NgModule({
   declarations: [
@@ -37,15 +38,16 @@ import { ConnectorsComponent } from './home/connectors/connectors.component';
     JsonFileSelectDirective,
     ExportModalComponent,
     FilterPipe,
-    ConnectorsComponent
+    ConnectorsComponent,
+    CodeEditorComponent,
+    ConnectorEditorComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
-    FormsModule,
-    MonacoEditorModule.forRoot()
+    FormsModule
   ],
   providers: [ApiService, FilterPipe],
   bootstrap: [AppComponent]
