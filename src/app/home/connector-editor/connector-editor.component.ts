@@ -32,8 +32,11 @@ export class ConnectorEditorComponent implements OnInit {
     if (data) {
       this.connectorList = JSON.parse(data);
     }
-    let index = parseInt(localStorage.getItem('selectedIndex') as string);
-    this.selectedConnector = this.connectorList[index];
+    if (!localStorage.getItem('selectedIndex')) {
+      this.router.navigate(['/home/connector']);
+    }
+    this.selectedIndex = parseInt(localStorage.getItem('selectedIndex') as string);
+    this.selectedConnector = this.connectorList[this.selectedIndex];
     if (this.selectedConnector.initCode) {
       this.selectedConnector.initCode = this.selectedConnector.initCode.join('\n');
     }
@@ -61,6 +64,18 @@ export class ConnectorEditorComponent implements OnInit {
   onCancelClick($event: any) {
     localStorage.removeItem('selectedIndex');
     this.router.navigate(['/home/connector']);
+  }
+  onDeleteClick($event: any) {
+    let modalRef: NgbModalRef = this.modalService.open(AlertModalComponent, { centered: true });
+    modalRef.componentInstance.title = 'Delete Node?';
+    modalRef.componentInstance.message = 'Are you sure you want to delete this connector?';
+    modalRef.result.then((result) => {
+      if (result) {
+        this.connectorList.splice(this.selectedIndex, 1);
+        localStorage.setItem('connectorList', JSON.stringify(this.connectorList));
+        this.onCancelClick(null);
+      }
+    }, (dismiss) => { });
   }
 
   onNewFieldClick($event: MouseEvent) {

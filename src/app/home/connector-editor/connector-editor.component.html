@@ -19,7 +19,11 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-end">
-                    <button class="btn btn-light font-13 border" (click)="onCancelClick($event)">
+                    <button class="btn btn-light font-13 border" (click)="onDeleteClick($event)">
+                        <span class="bi bi-trash me-2 text-danger"></span>
+                        <span class="text-uppercase">Delete</span>
+                    </button>
+                    <button class="btn btn-light font-13 border ms-3" (click)="onCancelClick($event)">
                         <span class="bi bi-x-circle me-2"></span>
                         <span class="text-uppercase">Cancel</span>
                     </button>
