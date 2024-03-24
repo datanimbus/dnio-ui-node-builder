@@ -89,7 +89,7 @@ export class ConnectorsComponent {
 
   get connectorListWithFilter() {
     if (this.searchTerm) {
-      return this.filterPipe.transform(this.connectorList, 'label', this.searchTerm);
+      return this.filterPipe.transform(this.connectorList, ['label', 'tags'], this.searchTerm);
     }
     return this.connectorList;
   }

@@ -37,18 +37,6 @@ export class NodeListComponent implements OnInit {
       this.nodeList = JSON.parse(data);
       this.groupList = _.uniq(this.nodeList.map(e => e.group));
     }
-    // if (this.nodeList && this.nodeList.length == 0) {
-    //   this.apiService.get('/assets/node-list.json').subscribe({
-    //     next: (value: any) => {
-    //       this.nodeList = value;
-    //       localStorage.setItem('nodeList', JSON.stringify(this.nodeList));
-    //       this.groupList = _.uniq(this.nodeList.map(e => e.group));
-    //     },
-    //     error: (err) => {
-    //       console.log(err);
-    //     }
-    //   });
-    // }
   }
 
   resetNode(data?: any) {
@@ -105,7 +93,7 @@ export class NodeListComponent implements OnInit {
     if (this.selectedGroup) {
       return this.filterPipe.transform(this.nodeList, 'group', this.selectedGroup);
     } else if (this.searchTerm) {
-      return this.filterPipe.transform(this.nodeList, 'label', this.searchTerm);
+      return this.filterPipe.transform(this.nodeList, ['label','tags'], this.searchTerm);
     } else {
       return this.nodeList;
     }

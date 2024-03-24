@@ -17,6 +17,10 @@
                         <label class="text-uppercase font-12 text-secondary mb-2" for="category">Category</label>
                         <input id="category" type="text" class="form-control" [(ngModel)]="selectedConnector.category">
                     </div>
+                    <div class="form-group d-flex flex-column align-items-start mb-3 me-3">
+                        <label class="text-uppercase font-12 text-secondary mb-2" for="tags">Tags</label>
+                        <input id="tags" type="text" class="form-control" [(ngModel)]="selectedConnector.tags">
+                    </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-end">
                     <button class="btn btn-light font-13 border" (click)="onDeleteClick($event)">

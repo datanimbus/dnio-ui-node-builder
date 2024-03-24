@@ -1,0 +1,32 @@
+<div class="modal-header">
+    <div class="modal-title">
+        <h5>Import/Export</h5>
+    </div>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss(false)"></button>
+</div>
+<div class="modal-body">
+    <h5>Import Marketplace</h5>
+    <p>Select Marketplace File</p>
+    <div class="input-group">
+        <input class="form-control" type="file" (click)="isValidJSON=false; true;"
+            (appJsonFileSelect)="onFileSelect($event)">
+        <button type="button" class="btn btn-success" (click)="onImportClick($event)"
+            [disabled]="!jsonData">Import</button>
+    </div>
+    <div class="d-flex align-items-center w-100 my-3">
+        <hr class="w-100 m-0">
+        <span class="mx-2 fw-500 font-12 text-muted">OR</span>
+        <hr class="w-100 m-0">
+    </div>
+    <h5>Export Marketplace</h5>
+    <p>Enter File Name</p>
+    <div class="input-group">
+        <input class="form-control" type="text" [(ngModel)]="filename" placeholder="Filename">
+        <input class="form-control" type="text" [(ngModel)]="version" placeholder="Version">
+        <div class="input-group-text">.json</div>
+        <button type="button" class="btn btn-success" (click)="onExportClick($event)">Export</button>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" (click)="activeModal.close(false)" class="btn btn-dark border">Done</button>
+</div>

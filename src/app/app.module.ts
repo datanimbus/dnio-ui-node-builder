@@ -22,6 +22,7 @@ import { FilterPipe } from './pipes/filter.pipe';
 import { ConnectorsComponent } from './home/connectors/connectors.component';
 import { CodeEditorComponent } from './utils/code-editor/code-editor.component';
 import { ConnectorEditorComponent } from './home/connector-editor/connector-editor.component';
+import { SettingsModalComponent } from './utils/settings-modal/settings-modal.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ConnectorEditorComponent } from './home/connector-editor/connector-edit
     FilterPipe,
     ConnectorsComponent,
     CodeEditorComponent,
-    ConnectorEditorComponent
+    ConnectorEditorComponent,
+    SettingsModalComponent
   ],
   imports: [
     BrowserModule,

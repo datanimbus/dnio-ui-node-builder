@@ -12,6 +12,62 @@ export class CommonService {
     this.updateCodeEditorState = new EventEmitter();
   }
 
+  setMarketplaceData(data?: MarketplaceData) {
+    if (!data) {
+      data = this.getMarketplaceData();
+    }
+    if (!data.version) {
+      data.version = 1;
+    }
+    if (!data.nodeList) {
+      data.nodeList = [];
+    }
+    if (!data.connectorList) {
+      data.connectorList = [];
+    }
+    if (!data.dataFormatList) {
+      data.dataFormatList = [];
+    }
+    if (!data.dataPipeList) {
+      data.dataPipeList = [];
+    }
+    localStorage.setItem('marketplace-version', data.version + '')
+    localStorage.setItem('nodeList', JSON.stringify(data.nodeList))
+    localStorage.setItem('connectorList', JSON.stringify(data.connectorList))
+    localStorage.setItem('dataFormatList', JSON.stringify(data.dataFormatList))
+    localStorage.setItem('dataPipeList', JSON.stringify(data.dataPipeList))
+  }
+
+  getMarketplaceData(): MarketplaceData {
+    const data: MarketplaceData = {} as MarketplaceData;
+    if (localStorage.getItem('marketplace-version')) {
+      data.version = parseInt(localStorage.getItem('marketplace-version') as string);
+    } else {
+      data.version = 1;
+    }
+    if (localStorage.getItem('nodeList')) {
+      data.nodeList = JSON.parse(localStorage.getItem('nodeList') as string);
+    } else {
+      data.nodeList = [];
+    }
+    if (localStorage.getItem('connectorList')) {
+      data.connectorList = JSON.parse(localStorage.getItem('connectorList') as string);
+    } else {
+      data.connectorList = [];
+    }
+    if (localStorage.getItem('dataFormatList')) {
+      data.dataFormatList = JSON.parse(localStorage.getItem('dataFormatList') as string);
+    } else {
+      data.dataFormatList = [];
+    }
+    if (localStorage.getItem('dataPipeList')) {
+      data.dataPipeList = JSON.parse(localStorage.getItem('dataPipeList') as string);
+    } else {
+      data.dataPipeList = [];
+    }
+    return data;
+  }
+
   initNodeData() {
     return {
       category: 'PROCESS',
@@ -88,4 +144,13 @@ export class CommonService {
     element.click();
     document.body.removeChild(element);
   }
+}
+
+
+export interface MarketplaceData {
+  version: number;
+  nodeList: Array<any>;
+  connectorList: Array<any>;
+  dataFormatList: Array<any>;
+  dataPipeList: Array<any>;
 }
