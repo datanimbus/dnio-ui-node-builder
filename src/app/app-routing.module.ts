@@ -10,11 +10,11 @@ const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   {
     path: 'home', component: HomeComponent, children: [
-      { path: '', pathMatch: 'full', redirectTo: 'node' },
-      { path: 'node', component: NodeListComponent },
-      { path: 'node/:id', component: NodeBuilderComponent },
+      { path: '', pathMatch: 'full', redirectTo: 'connector' },
       { path: 'connector', component: ConnectorsComponent },
       { path: 'connector/:id', component: ConnectorEditorComponent },
+      { path: 'node', component: NodeListComponent },
+      { path: 'node/:id', component: NodeBuilderComponent },
     ]
   }
 ];
